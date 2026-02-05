@@ -1,0 +1,6 @@
+path: C:\Users\Maikouce\Desktop\部分开源\Auxiliary_annotation\data\admin\1\TrainData
+train: images/train
+val: images/val
+nc: 1
+names:
+- '1'

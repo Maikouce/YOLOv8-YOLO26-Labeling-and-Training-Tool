@@ -1,0 +1,134 @@
+<!-- templates/tasks.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>任务列表 - {{ owner }}</title>
+    <link rel="icon" href="{{ url_for('static', filename='1Star.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_main.css') }}">
+    <style>
+        /* Minimal CSS for modal */
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: none;
+            width: 300px; /* 稍微定宽，防止按钮挤压 */
+            text-align: center;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        .modal button {
+            margin: 5px;
+            width: 100%; /* 让按钮占满宽度，看起来整齐 */
+        }
+
+        /* 新增：右上角登出按钮样式 */
+        .user-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 0.9rem;
+        }
+        .logout-btn {
+            text-decoration: none;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+        .container { position: relative; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 新增：右上角登出 -->
+        <div class="user-bar">
+            <span style="margin-right: 10px; color: #666;">{{ current_user.username }}</span>
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">退出</a>
+        </div>
+
+        <h1>所有者: <span id="ownerName">{{ owner }}</span></h1>
+        <div class="header-decoration"></div>
+        <p><a href="/">← 返回主页</a></p>
+        <div class="new-item-form">
+            <h3>创建新任务</h3>
+            <input type="text" id="newTaskInput" placeholder="输入新任务名称">
+            <button id="createTaskBtn" class="btn btn-primary">创建并开始标注</button>
+        </div>
+        <h2>现有任务</h2>
+        <ul id="taskList">
+            <!-- 任务列表将由 JS 动态填充 -->
+        </ul>
+        <div id="loadingMessage" style="display: none;">正在加载任务数据...</div>
+        <div id="noTasksMessage" style="display: none;">当前没有任务，请在下方创建新任务。</div>
+    </div>
+
+    <!-- Annotation Type Selection Modal -->
+    <div id="annotationTypeModal" class="modal">
+        <h3>选择标注类型</h3>
+        <p id="modalTaskName" style="margin-bottom: 15px; color: #666;"></p>
+
+        <button class="btn btn-primary" id="selectRectBtn">矩形标注 (Rect)</button>
+        <button class="btn btn-secondary" id="selectPolygonBtn" style="background-color: #17a2b8;">多边形标注 (Polygon)</button>
+        <button class="btn btn-warning" id="selectOBBBtn" style="background-color: #ffc107;">旋转框标注 (OBB)</button>
+
+        <hr style="margin: 10px 0;">
+        <button class="btn" onclick="closeAnnotationTypeModal()" style="background-color: #6c757d; color: white;">取消</button>
+    </div>
+    <div id="modalOverlay" class="modal-overlay"></div>
+
+    <script>
+        let currentOwner = "{{ owner }}";
+        let currentTask;
+
+        function showAnnotationTypeModal(taskName) {
+            currentTask = taskName;
+            document.getElementById('modalTaskName').textContent = `任务: ${taskName}`;
+            document.getElementById('annotationTypeModal').style.display = 'block';
+            document.getElementById('modalOverlay').style.display = 'block';
+        }
+
+        function closeAnnotationTypeModal() {
+            document.getElementById('annotationTypeModal').style.display = 'none';
+            document.getElementById('modalOverlay').style.display = 'none';
+            currentTask = null;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('selectRectBtn').onclick = () => {
+                if (currentTask) window.location.href = `/annotate/${currentOwner}/${currentTask}/rect`;
+            };
+            document.getElementById('selectPolygonBtn').onclick = () => {
+                if (currentTask) window.location.href = `/annotate/${currentOwner}/${currentTask}/polygon`;
+            };
+            document.getElementById('selectOBBBtn').onclick = () => {
+                if (currentTask) window.location.href = `/annotate/${currentOwner}/${currentTask}/obb`;
+            };
+
+            document.getElementById('modalOverlay').onclick = closeAnnotationTypeModal;
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='js/tasks.js') }}"></script>
+</body>
+</html>

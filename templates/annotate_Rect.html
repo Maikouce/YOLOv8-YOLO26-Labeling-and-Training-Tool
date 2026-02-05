@@ -1,0 +1,126 @@
+<!-- templates/annotate_Rect.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>标注工具 - {{ task_name }}</title>
+<link rel="icon" href="{{ url_for('static', filename='1Star.png') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style_annotate.css') }}">
+</head>
+<body>
+<!-- 隐藏的input用于获取数据 -->
+<input type="hidden" id="owner" value="{{ owner }}">
+<input type="hidden" id="taskName" value="{{ task_name }}">
+
+<div class="container">
+<aside class="sidebar">
+    <h2><a href="/tasks/{{ owner }}" style="text-decoration: none; color: inherit;">任务: {{ task_name }}</a></h2>
+    <div class="control-group upload-and-finish">
+      <div class="upload-block">
+        <label for="imageUploadInput" class="btn">上传数据</label>
+        <input type="file" id="imageUploadInput" multiple accept="image/png, image/jpeg, image/bmp" style="display: none;">
+        <small>上传的图片将立即保存到当前任务中。</small>
+        <!-- Add upload progress bar -->
+        <div id="uploadProgressContainer" style="display: none; margin-top: 5px;">
+             <progress id="uploadProgressBar" value="0" max="100" style="width: 100%;"></progress>
+             <small id="uploadStatusText"></small>
+        </div>
+      </div>
+      <div class="finish-block">
+        <button id="finish-and-train-btn" class="btn">完成标注</button>
+        <small>保存当前标注并跳转到训练配置页面。</small>
+      </div>
+    </div>
+<div class="control-group">
+        <h3>绘制/编辑模式</h3>
+        <p>当前模式: <span id="currentModeDisplay">标注</span> (W/Q)</p>
+        <button id="deleteCurrentImageBtn" class="btn" style="background-color: #dc3545; margin-top: 10px;">删除当前图片 (Ctrl+Shift+D)</button>
+        <button id="batchManageBtn" class="btn" style="margin-top: 10px;">批量图片管理</button>
+    </div>
+
+    <!-- Status Message moved to fixed position, but we keep the container for historical context if needed -->
+    <!-- <div class="control-group">
+        <div id="statusMessage" class="status-message"></div>
+    </div> -->
+
+
+    <div class="control-group">
+        <h3>标签管理</h3>
+        <input type="text" id="newLabelInput" placeholder="输入新标签名">
+        <button id="addLabelBtn" class="btn">添加标签</button>
+        <div id="labelsList"></div>
+    </div>
+    <div class="control-group">
+        <h3>操作提示</h3>
+        <ul class="tips">
+            <li>~：进入辅助标注；进入后会出现“点提示”和“矩形框提示”两种方式</li>
+            <li>再次按 ~：退出辅助标注</li>
+            <li>按住 Shift：负样本点提示（neg）</li>
+            <li>空格：完成本次辅助标注</li>
+            <li>W/Q: 切换 标注/编辑 模式</li>
+            <li>A/D: 上/下一张图片 (自动保存)</li>
+            <li>←↑↓→: 移动选中标注 (编辑模式)</li>
+            <li>Ctrl+←↑↓→: 大幅移动选中标注</li>
+            <li>Tab/Shift+Tab: 切换选中标注 / 切换最新标注的标签</li>
+            <li>E / Delete: 删除选中标注</li>
+            <li>数字键 1-9: 快速更改选中标注的标签</li>
+            <li>Ctrl+Shift+D: 删除当前图片</li>
+            <li>Ctrl + Z: 撤销上一步操作</li>
+            <li>滚轮: 缩放图片</li>
+            <li>右键拖动: 平移图片</li>
+            <li>右键单击标注: 弹出操作菜单</li>
+            <li>Esc: 取消当前操作/取消选中</li>
+        </ul>
+    </div>
+
+</aside>
+
+<main class="main-content">
+    <div class="main-header">
+        <div class="nav-controls">
+            <button id="prevImageBtn" class="btn">< 上一张 (A)</button>
+            <span id="imageInfo">0 / 0</span>
+            <button id="nextImageBtn" class="btn">下一张 (D) ></button>
+        </div>
+        <div>
+            <!-- Placeholder for future header items -->
+        </div>
+    </div>
+    <div class="canvas-wrapper">
+        <canvas id="annotationCanvas"></canvas>
+    </div>
+
+    <div id="contextMenu" class="context-menu" style="display: none;"></div>
+</main>
+</div>
+
+<!-- Status Message (Fixed position defined in CSS) -->
+<div id="statusMessage" class="status-message"></div>
+
+<!-- Batch Management Modal Structure -->
+<div id="modalOverlay" style="display: none;"></div>
+<div id="batchManagementModal" style="display: none;">
+    <div class="modal-header">
+        <h3>批量图片管理</h3>
+        <button class="modal-close-btn">&times;</button>
+    </div>
+    <div class="modal-content">
+        <div style="margin-bottom: 10px;">
+            <input type="checkbox" id="selectAllImages">
+            <label for="selectAllImages">全选</label>
+        </div>
+        <div id="imageListContainer">
+            <!-- Image list items will be injected here -->
+        </div>
+    </div>
+</div>
+
+
+<div id="loadingOverlay" style="display: none;">
+    <div id="loadingText">加载中...</div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pages/annotate_Rect.js') }}" type="module"></script>
+</body>
+</html>

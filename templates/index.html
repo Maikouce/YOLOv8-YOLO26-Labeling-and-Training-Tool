@@ -1,0 +1,62 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title> YOLOv8-YOLO26标注训练平台 - 主页</title>
+    <link rel="icon" href="{{ url_for('static', filename='1Star.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_main.css') }}">
+    <style>
+        /* 新增：右上角用户栏样式 */
+        .user-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 0.9rem;
+        }
+        .logout-btn {
+            text-decoration: none;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+        /* 确保 container 相对定位以便内部元素定位 */
+        .container {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 新增：右上角登出按钮 -->
+        <div class="user-bar">
+            <span style="margin-right: 10px; color: #666;">用户: <strong>{{ current_user.username }}</strong></span>
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">退出</a>
+        </div>
+
+        <h1>在线标注训练网站</h1>
+        <div class="header-decoration"></div>
+        <p>请选择一个项目所有者或创建一个新的所有者以开始您的工作。</p>
+
+        <div class="new-item-form">
+            <h3>进入或创建新所有者</h3>
+            <input type="text" id="newOwnerInput" placeholder="输入所有者名称">
+            <button id="goToOwnerBtn" class="btn btn-primary">进入工作区</button>
+        </div>
+
+        <h2>项目所有者列表</h2>
+        <ul id="ownerList">
+            <!-- 所有者列表将由JS动态填充 -->
+        </ul>
+        <div id="loadingMessage" style="display: none;">正在加载数据...</div>
+        <div id="noOwnersMessage" style="display: none;">当前没有项目，请在上方创建新的所有者。</div>
+    </div>
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+</body>
+</html>

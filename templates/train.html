@@ -1,0 +1,172 @@
+<!-- train.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>模型训练 - {{ task_name }}</title>
+    <link rel="icon" href="{{ url_for('static', filename='1Star.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style_main.css') }}">
+    <style>
+        /* 新增：右上角登出按钮样式 */
+        .user-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 0.9rem;
+        }
+        .logout-btn {
+            text-decoration: none;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+        .container { position: relative; }
+
+        /* 停止按钮样式 */
+        #stop-train-btn {
+            display: none;
+            width: 100%;
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        #stop-train-btn:hover:not(:disabled) {
+            background-color: #c82333;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+        #stop-train-btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* 按钮组容器 */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 新增：右上角登出 -->
+        <div class="user-bar">
+            <span style="margin-right: 10px; color: #666;">{{ current_user.username }}</span>
+            <a href="{{ url_for('auth.logout') }}" class="logout-btn">退出</a>
+        </div>
+
+        <h1>模型训练</h1>
+        <div class="header-decoration"></div>
+        <p>
+            <a href="/tasks/{{ owner }}">← 返回任务列表</a>
+        </p>
+        <h2>项目: {{ owner }} / {{ task_name }}</h2>
+
+        <form id="train-form">
+            <div class="form-group">
+                <label for="model-select">1. 选择预训练模型</label>
+                <select class="form-select" id="model-select" name="model" required>
+                    <option value="" disabled selected>正在加载模型...</option>
+                </select>
+            </div>
+
+            <hr style="margin: 2rem 0;">
+            <h3>2. 设置训练参数</h3>
+            <div class="form-row">
+                <div>
+                    <label for="epochs">Epochs</label>
+                    <input type="number" class="form-control" id="epochs" name="epochs" value="300" min="1" required>
+                </div>
+                <div>
+                    <label for="batch">Batch Size</label>
+                    <input type="number" class="form-control" id="batch" name="batch" value="8" min="1" required>
+                </div>
+                <div>
+                    <label for="train_ratio">训练集比例</label>
+                    <input type="number" class="form-control" id="train_ratio" name="train_ratio" value="0.99" min="0.1" max="1.0" step="0.01" required>
+                </div>
+            </div>
+            <div class="form-row" style="margin-top: 1.5rem;">
+                <div>
+                    <label for="imgsz">Image Size</label>
+                    <input type="number" class="form-control" id="imgsz" name="imgsz" value="640" step="32" required>
+                </div>
+                <div>
+                    <label for="device">Device</label>
+                    <input type="text" class="form-control" id="device" name="device" value="0" placeholder="e.g., 0 or cpu">
+                </div>
+            </div>
+
+            <hr style="margin: 2rem 0;">
+            <h3>3. 自动导出设置</h3>
+            <div class="form-row">
+                <div>
+                    <label for="export-format">导出格式 (Format)</label>
+                    <input type="text" class="form-control" id="export-format" name="export_format" value="onnx">
+                </div>
+                <div>
+                    <label for="export-opset">Opset</label>
+                    <input type="number" class="form-control" id="export-opset" name="export_opset" value="17" min="7">
+                </div>
+            </div>
+
+            <!-- 按钮组 -->
+            <div class="button-group" style="margin-top: 2.5rem;">
+                <button type="submit" id="start-train-btn" class="btn btn-success" style="width: 100%; padding: 1rem;">
+                    <span id="btn-spinner" class="spinner-border" role="status" style="display: none;"></span>
+                    <span id="btn-text">开始准备数据并训练</span>
+                </button>
+
+                <!-- 新增：停止按钮 -->
+                <button type="button" id="stop-train-btn">
+                    停止训练
+                </button>
+            </div>
+        </form>
+
+        <div class="log-container">
+            <div id="progress-container">
+                <strong>训练进度 (Epochs):</strong>
+                <div class="progress">
+                    <div id="training-progress-bar" class="progress-bar" style="width: 0%; transition: none;">0%</div>
+                </div>
+            </div>
+            <pre id="log-output"></pre>
+            <div id="training-complete-alert" class="alert alert-success" style="display: none;">
+                <strong>训练完成!</strong>
+                <button id="download-results-btn" class="btn btn-info" style="margin-left: 1rem;">下载完整结果 (ZIP)</button>
+            </div>
+            <div id="error-alert" class="alert alert-danger" style="display: none;">
+                <strong>发生错误:</strong> <pre id="error-message" style="margin-top: 0.5rem;"></pre>
+            </div>
+        </div>
+
+        <div>
+            <select id="runs-select" class="form-select">
+                <option value="">-- 加载中 --</option>
+            </select>
+            <button id="download-selected-btn" class="btn btn-primary" style="margin-left: 0.5rem;">下载选中结果 (ZIP)</button>
+        </div>
+        <small id="runs-help" style="display:block; margin-top:0.5rem; color:#666;">若列表为空，说明该任务还没有训练记录。</small>
+    </div>
+
+    <!-- 隐藏的input用于获取数据 -->
+    <input type="hidden" id="owner" value="{{ owner }}">
+    <input type="hidden" id="taskName" value="{{ task_name }}">
+    <script src="{{ url_for('static', filename='js/train.js') }}"></script>
+</body>
+</html>
