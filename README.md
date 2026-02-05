@@ -69,7 +69,7 @@ python app.py
 
 ### 联系作者
 如果你想进群交流、反馈 Bug 或咨询进阶版功能，请扫描下方二维码添加我的微信：
-![微信二维码.png](%E4%BD%9C%E8%80%85%E8%81%94%E7%B3%BB%E6%96%B9%E5%BC%8F/%E5%BE%AE%E4%BF%A1%E4%BA%8C%E7%BB%B4%E7%A0%81.png)
+![微信二维码.png](%E4%BD%9C%E8%80%85%E8%87%AA%E8%BF%B0/%E5%BE%AE%E4%BF%A1%E4%BA%8C%E7%BB%B4%E7%A0%81.png)
 完整版请看
 https://www.bilibili.com/video/BV1gh6vBnES4/?spm_id_from=333.1387.homepage.video_card.click&vd_source=bca1c22721544bc54b9cabff893e7b70
 > 
