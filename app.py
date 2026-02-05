@@ -54,9 +54,9 @@ def create_app():
         db.create_all()
         # 创建默认管理员
         if not User.query.filter_by(username='admin').first():
-            print("Creating default admin user (admin/@XKRS1234)...")
+            print("Creating default admin user (admin/Maikouce)...")
             admin = User(username='admin', is_admin=True)
-            admin.set_password('@XKRS1234')
+            admin.set_password('Maikouce')
             db.session.add(admin)
             db.session.commit()
             os.makedirs(os.path.join(app.config['DATA_DIR'], 'admin'), exist_ok=True)

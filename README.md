@@ -1,6 +1,6 @@
-# YOLO-SAM-WebUI：轻量级在线标注与训练平台 (部分开源版)
+# YOLOv8-YOLO26-Labeling-and-Training-Tool：轻量级在线标注与训练平台 (部分开源)
 
-🚀 **一个基于 Flask + YOLOv8 + SAM3 的全流程视觉任务开发平台。**
+🚀 **一个基于 Flask + YOLOv8-26 + SAM3 的全流程视觉任务开发平台。**
 
 本仓库提供了一个高度集成的 Web 环境，旨在解决计算机视觉开发者在“数据标注”与“模型训练”之间来回切换的痛点。你可以在浏览器中完成从图片上传、矩形框标注到模型训练、日志监控、结果导出的全部工作。
 
@@ -26,9 +26,9 @@
 
 ## 🛠️ 技术栈
 
--   **后端**: Python 3.9+, Flask, Flask-SQLAlchemy, Flask-Login, PyTorch, Ultralytics
+-   **后端**: Python 3.10+, Flask, Flask-SQLAlchemy, Flask-Login, PyTorch, Ultralytics
 -   **前端**: 原生 JavaScript (ES6 Modules), Canvas API, Bootstrap 5, Chart.js
--   **算法**: YOLOv8 / YOLOv11
+-   **算法**: YOLOv8 / YOLOv11/26
 
 ---
 
@@ -53,7 +53,7 @@ python app.py
 ```
 访问地址：`http://127.0.0.1:8001`
 默认管理员账号：`admin` 
-默认管理员密码：`@XKRS1234`
+默认管理员密码：`Maikouce`
 
 ---
 
